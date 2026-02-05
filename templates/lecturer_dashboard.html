@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card p-4 shadow">
+        <h2>Lecturer Dashboard</h2>
+
+        <p>
+            Welcome, <strong>{{ lecturer.email }}</strong><br>
+            School: <strong>{{ lecturer.school }}</strong>
+        </p>
+
+        <hr>
+
+        <h4>Start New Attendance Session</h4>
+
+        <form method="POST" action="/start_session">
+            <div class="mb-3">
+                <label>Select Course / Department</label>
+                <select name="course" class="form-control" required>
+                    <option value="">-- Select Course --</option>
+                    {% for dept in departments %}
+                        <option value="{{ dept }}">{{ dept }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                🚀 Start Session & Generate QR
+            </button>
+        </form>
+
+        <br>
+        <a href="/auth/logout" class="btn btn-danger">Logout</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4">
+            <h3 class="text-center mb-4">Student Registration</h3>
+
+            <form method="POST" action="/auth/register_student">
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Full Name</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label>Registration Number</label>
+                    <input type="text" name="role_id" class="form-control" required>
+                </div>
+
+                <!-- School Dropdown -->
+                <div class="mb-3">
+                    <label>School</label>
+                    <select name="school" id="schoolSelect" class="form-control" required>
+                        <option value="">Select School</option>
+                        {% for s in schools %}
+                            <option value="{{ s.school }}">{{ s.school }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Department Dropdown -->
+                <div class="mb-3">
+                    <label>Department</label>
+                    <select name="department" id="deptSelect" class="form-control" required>
+                        <option value="">Select Department</option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-success w-100">Register</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to auto-load departments -->
+<script>
+    const schoolsData = {{ schools|tojson }};
+    const schoolSelect = document.getElementById("schoolSelect");
+    const deptSelect = document.getElementById("deptSelect");
+
+    schoolSelect.addEventListener("change", function() {
+        const selectedSchool = this.value;
+
+        deptSelect.innerHTML = '<option value="">Select Department</option>';
+
+        const school = schoolsData.find(s => s.school === selectedSchool);
+
+        if (school) {
+            school.departments.forEach(dept => {
+                const option = document.createElement("option");
+                option.value = dept;
+                option.textContent = dept;
+                deptSelect.appendChild(option);
+            });
+        }
+    });
+</script>
+
+{% endblock %}

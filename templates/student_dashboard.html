@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="card p-4 shadow text-center">
+        <h2>Student Dashboard</h2>
+        <p>Welcome, <strong>{{ session.name }}</strong></p>
+
+        <a href="/scan" class="btn btn-primary mt-3">
+            📷 Scan Attendance QR
+        </a>
+
+        <br><br>
+        <a href="/auth/logout" class="btn btn-danger">Logout</a>
+    </div>
+</div>
+{% endblock %}
