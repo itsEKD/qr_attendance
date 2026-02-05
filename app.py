@@ -105,47 +105,37 @@ def scan():
 # -----------------------
 # Mark Attendance (Student scans QR)
 # -----------------------
+from datetime import datetime
+
 @app.route('/mark_attendance/<token>')
 def mark_attendance(token):
     if session.get('role') != 'student':
         return redirect('/auth/login')
 
-    # Find active session
-    session_data = sessions_col.find_one({
-        "token": token,
-        "active": True
-    })
+    student_id = session.get('user_id')
+    student = users_col.find_one({"_id": ObjectId(student_id)})
 
-    if not session_data:
-        return "❌ Session Expired or Invalid"
-
-    session_id = str(session_data['_id'])
-
-    # Prevent duplicate attendance
     already_marked = attendance_col.find_one({
-        "session_id": session_id,
-        "student_id": session.get('user_id')
+        "student_id": student_id,
+        "session_token": token
     })
-
     if already_marked:
         return "⚠️ Attendance Already Marked"
 
-    # Get student full data
-    student = users_col.find_one({
-        "_id": ObjectId(session.get('user_id'))
-    })
+    session_data = sessions_col.find_one({"token": token})
+    if session_data:
+        attendance_col.insert_one({
+            "student_id": student_id,
+            "admission": student['role_id'],
+            "name": student.get('name', ''),      # ← fetch student name
+            "course": session_data['course'],     # ← fetch course
+            "scan_time": datetime.utcnow(),
+            "session_token": token
+        })
+        return "✅ Attendance Recorded Successfully"
+    else:
+        return "❌ Invalid Session"
 
-    # Record attendance
-    attendance_col.insert_one({
-        "session_id": session_id,
-        "student_id": session.get('user_id'),
-        "admission": student.get('role_id'),
-        "name": student.get('name'),
-        "course": session_data.get('course'),
-        "scan_time": datetime.now()
-    })
-
-    return "✅ Attendance Recorded Successfully"
 
 
 # -----------------------
@@ -156,8 +146,14 @@ def marksheet(session_id):
     if session.get('role') != 'lecturer':
         return redirect('/auth/login')
 
-    records = attendance_col.find({"session_id": session_id})
-    qr_token = sessions_col.find_one({"_id": ObjectId(session_id)})["token"]
+    session_data = sessions_col.find_one({"_id": ObjectId(session_id)})
+    if not session_data:
+        return "❌ Session not found"
+
+    qr_token = session_data["token"]
+
+    # Fetch attendance by session_token
+    records = list(attendance_col.find({"session_token": qr_token}))
 
     return render_template(
         'marksheet.html',
@@ -165,6 +161,7 @@ def marksheet(session_id):
         qr_token=qr_token,
         session_id=session_id
     )
+
 
 @app.route('/end_session/<session_id>')
 def end_session(session_id):
@@ -205,6 +202,21 @@ def export_excel(session_id):
     wb.save(tmp.name)
 
     return send_file(tmp.name, as_attachment=True, download_name="attendance.xlsx")
+
+@app.route('/session_attendance/<token>')
+def session_attendance(token):
+    if session.get('role') != 'lecturer':
+        return redirect('/auth/login')
+
+    session_data = sessions_col.find_one({"token": token})
+    if not session_data:
+        return "❌ Invalid Session"
+
+    attendance_records = list(attendance_col.find({"session_token": token}))
+    return render_template('session_attendance.html',
+                           attendance_records=attendance_records,
+                           session_course=session_data['course'])
+
 
 # -----------------------
 # Run App
