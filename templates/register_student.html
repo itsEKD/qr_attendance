@@ -1,32 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
+<div class="row justify-content-center mt-5">
     <div class="col-md-6">
-        <div class="card p-4">
+        <div class="card shadow-sm p-4">
             <h3 class="text-center mb-4">Student Registration</h3>
 
             <form method="POST" action="/auth/register_student">
 
+                <!-- Full Name -->
                 <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" id="name" name="name" class="form-control" placeholder="Enter your full name" required>
                 </div>
 
+                <!-- Email -->
                 <div class="mb-3">
-                    <label>Full Name</label>
-                    <input type="text" name="name" class="form-control" required>
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
                 </div>
 
+                <!-- Registration Number -->
                 <div class="mb-3">
-                    <label>Registration Number</label>
-                    <input type="text" name="role_id" class="form-control" required>
+                    <label for="role_id" class="form-label">Admission / Registration Number</label>
+                    <input type="text" id="role_id" name="role_id" class="form-control" placeholder="e.g. INTE/MG/2020/05/18" required>
                 </div>
 
                 <!-- School Dropdown -->
                 <div class="mb-3">
-                    <label>School</label>
-                    <select name="school" id="schoolSelect" class="form-control" required>
+                    <label for="schoolSelect" class="form-label">School</label>
+                    <select name="school" id="schoolSelect" class="form-select" required>
                         <option value="">Select School</option>
                         {% for s in schools %}
                             <option value="{{ s.school }}">{{ s.school }}</option>
@@ -36,24 +39,26 @@
 
                 <!-- Department Dropdown -->
                 <div class="mb-3">
-                    <label>Department</label>
-                    <select name="department" id="deptSelect" class="form-control" required>
+                    <label for="deptSelect" class="form-label">Department</label>
+                    <select name="department" id="deptSelect" class="form-select" required>
                         <option value="">Select Department</option>
                     </select>
                 </div>
 
+                <!-- Password -->
                 <div class="mb-3">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required>
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Choose a strong password" required>
                 </div>
 
+                <!-- Submit -->
                 <button type="submit" class="btn btn-success w-100">Register</button>
             </form>
         </div>
     </div>
 </div>
 
-<!-- JavaScript to auto-load departments -->
+<!-- JS to populate departments dynamically -->
 <script>
     const schoolsData = {{ schools|tojson }};
     const schoolSelect = document.getElementById("schoolSelect");
@@ -61,11 +66,9 @@
 
     schoolSelect.addEventListener("change", function() {
         const selectedSchool = this.value;
-
         deptSelect.innerHTML = '<option value="">Select Department</option>';
 
         const school = schoolsData.find(s => s.school === selectedSchool);
-
         if (school) {
             school.departments.forEach(dept => {
                 const option = document.createElement("option");
@@ -76,5 +79,4 @@
         }
     });
 </script>
-
 {% endblock %}

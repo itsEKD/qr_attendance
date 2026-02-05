@@ -24,16 +24,18 @@ def register_student():
 
         hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
+        # Insert new student into users collection
         users_col.insert_one({
+            "name": name,
             "email": email,
             "password": hashed.decode('utf-8'),
             "role": "student",
             "role_id": role_id,
-            "name": name,
+            "verified": True,
             "school": school,
-            "department": department,
-            "verified": True
+            "department": department
         })
+
 
         flash("✅ Registration successful!", "success")
         return redirect('/auth/login')

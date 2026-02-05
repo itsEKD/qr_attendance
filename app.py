@@ -127,14 +127,16 @@ def mark_attendance(token):
         attendance_col.insert_one({
             "student_id": student_id,
             "admission": student['role_id'],
-            "name": student.get('name', ''),      # ← fetch student name
-            "course": session_data['course'],     # ← fetch course
+            "name": student.get('name', ''),      # ← Full Name
+            "email": student.get('email', ''),    # ← Email
+            "course": session_data['course'],
             "scan_time": datetime.utcnow(),
             "session_token": token
         })
         return "✅ Attendance Recorded Successfully"
     else:
         return "❌ Invalid Session"
+
 
 
 
@@ -187,15 +189,17 @@ def export_excel(session_id):
     ws.title = "Attendance"
 
     # Headers
-    ws.append(["Admission", "Name", "Course", "Scan Time"])
+    ws.append(["Admission", "Name", "Email", "Course", "Scan Time"])
 
     for r in records:
         ws.append([
             r.get('admission'),
             r.get('name'),
+            r.get('email'),
             r.get('course'),
             str(r.get('scan_time'))
         ])
+
 
     # Save to temp file
     tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx")
