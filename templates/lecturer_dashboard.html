@@ -2,36 +2,69 @@
 
 {% block content %}
 <div class="container mt-5">
-    <div class="card p-4 shadow">
-        <h2>Lecturer Dashboard</h2>
 
-        <p>
-            Welcome, <strong>{{ lecturer.email }}</strong><br>
-            School: <strong>{{ lecturer.school }}</strong>
-        </p>
-
-        <hr>
-
-        <h4>Start New Attendance Session</h4>
-
-        <form method="POST" action="/start_session">
-            <div class="mb-3">
-                <label>Select Course / Department</label>
-                <select name="course" class="form-control" required>
-                    <option value="">-- Select Course --</option>
-                    {% for dept in departments %}
-                        <option value="{{ dept }}">{{ dept }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-
-            <button type="submit" class="btn btn-success">
-                🚀 Start Session & Generate QR
-            </button>
-        </form>
-
-        <br>
-        <a href="/auth/logout" class="btn btn-danger">Logout</a>
+    <!-- Welcome Card -->
+    <div class="card shadow mb-4">
+        <div class="card-body text-center">
+            <h2 class="card-title mb-2">Lecturer Dashboard</h2>
+            <p class="mb-0">
+                Welcome, <strong>{{ lecturer.email }}</strong>
+            </p>
+            <p class="mb-0">
+                School: <strong>{{ lecturer.school }}</strong>
+            </p>
+        </div>
     </div>
+
+    <!-- Start Attendance Session -->
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <h4 class="mb-3">Start New Attendance Session</h4>
+            <form method="POST" action="/start_session" class="row g-3">
+                <div class="col-md-8">
+                    <label for="courseSelect" class="form-label">Select Course / Department</label>
+                    <select name="course" id="courseSelect" class="form-select" required>
+                        <option value="">-- Select Course --</option>
+                        {% for dept in departments %}
+                            <option value="{{ dept }}">{{ dept }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">
+                        🚀 Start & Generate QR
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Active / Previous Sessions -->
+    {% if active_sessions %}
+    <div class="row">
+        {% for session in active_sessions %}
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ session.course }}</h5>
+                    <p class="card-text">
+                        Started: {{ session.start_time.strftime('%Y-%m-%d %H:%M') }}
+                    </p>
+                    <img src="{{ url_for('static', filename='qr_codes/' + session.token + '.png') }}" class="img-fluid mb-2" alt="QR Code">
+                    <div class="d-grid gap-2">
+                        <a href="/marksheet/{{ session._id }}" class="btn btn-primary btn-sm">View Marksheet</a>
+                        <a href="/end_session/{{ session._id }}" class="btn btn-danger btn-sm">End Session</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="/auth/logout" class="btn btn-outline-danger">Logout</a>
+    </div>
+
 </div>
 {% endblock %}

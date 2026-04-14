@@ -20,13 +20,17 @@ app.register_blueprint(auth, url_prefix='/auth')
 # Ensure QR folder exists
 os.makedirs("static/qr_codes", exist_ok=True)
 
-
+@app.context_processor
+def inject_now():
+    return {'datetime': datetime}
 # -----------------------
 # Home
 # -----------------------
+
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', datetime=datetime)
+
 
 
 # -----------------------

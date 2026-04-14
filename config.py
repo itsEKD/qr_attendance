@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 
 # MongoDB Atlas URI including the database name
-MONGO_URI = "mongodb+srv://eliwaindah:eliwaindaheliwashitojossie@cluster0.jyz0y.mongodb.net/campus_project?retryWrites=true&w=majority"
+MONGO_URI = "mongodb+srv://eliwaindah:test1234@cluster0.g6igyvg.mongodb.net/"
 
 # Connect to MongoDB
 client = MongoClient(MONGO_URI)
