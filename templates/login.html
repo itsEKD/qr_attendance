@@ -1,29 +1,144 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card p-4">
-            <h3 class="text-center mb-4">Login</h3>
+<style>
+  body {
+    background: #0f0f13;
+  }
 
-            <form method="POST" action="/auth/login">
-                <div class="mb-3">
-                    <label>Email</label>
-                    <input type="email" name="email" class="form-control" required>
-                </div>
+  .login-wrapper {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-                <div class="mb-3">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    background: #16151c;
+    border: 1px solid #2a2835;
+    border-radius: 16px;
+    padding: 28px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    color: #e8e6f0;
+  }
 
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-            </form>
+  .login-title {
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 6px;
+  }
 
-            <div class="text-center mt-3">
-                <a href="/auth/register_student">Don't have an account? Register</a>
-            </div>
-        </div>
+  .login-sub {
+    text-align: center;
+    font-size: 12px;
+    color: #5c5875;
+    margin-bottom: 20px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #5c5875;
+    margin-bottom: 6px;
+  }
+
+  .form-control {
+    background: #0f0f13;
+    border: 1px solid #2a2835;
+    color: #e8e6f0;
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+
+  .form-control:focus {
+    border-color: #7c3aed;
+    box-shadow: none;
+    background: #0f0f13;
+    color: #fff;
+  }
+
+  .btn-primary {
+    background: #7c3aed;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+
+  .btn-primary:hover {
+    background: #6d28d9;
+  }
+
+  .login-footer {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 12px;
+  }
+
+  .login-footer a {
+    color: #a78bfa;
+    text-decoration: none;
+  }
+
+  .login-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .top-link {
+    text-align: center;
+    margin-top: 12px;
+    font-size: 11px;
+    color: #5c5875;
+  }
+
+  .top-link a {
+    color: #7c7a95;
+    text-decoration: none;
+  }
+
+  .top-link a:hover {
+    color: #a78bfa;
+  }
+</style>
+
+<div class="login-wrapper">
+
+  <div class="login-card">
+
+    <div class="login-title">QR Attendance System</div>
+    <div class="login-sub">Sign in to continue</div>
+
+    <form method="POST" action="/auth/login">
+
+      <div class="mb-3">
+        <label class="form-label">Institution Email</label>
+        <input type="email" name="email" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input type="password" name="password" class="form-control" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">
+        Login
+      </button>
+    </form>
+
+    <div class="login-footer">
+      Don’t have an account?
+      <a href="/auth/register_student">Register as Student</a>
     </div>
+
+    <div class="top-link">
+      <a href="/">← Back to Home</a>
+    </div>
+
+  </div>
+
 </div>
 {% endblock %}

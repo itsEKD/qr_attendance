@@ -1,30 +1,256 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5 text-center">
-    <h2>Scan QR to Mark Attendance</h2>
+<style>
+  body { background:#0f0f13; }
 
-    <div id="reader" style="width:300px; margin:auto;"></div>
+  .dash-root {
+    display:flex;
+    height: calc(100vh - 120px);
+    font-family:'DM Sans',sans-serif;
+    background:#0f0f13;
+    color:#e8e6f0;
+    border-radius:12px;
+    overflow:hidden;
+  }
 
-    <p id="result" class="mt-3"></p>
+  .sidebar {
+    width:240px;
+    background:#16151c;
+    border-right:1px solid #2a2835;
+    display:flex;
+    flex-direction:column;
+  }
+
+  .sidebar-brand {
+    padding:20px;
+    border-bottom:1px solid #2a2835;
+  }
+
+  .brand-logo {
+    font-family:'Space Mono',monospace;
+    color:#a78bfa;
+    font-weight:700;
+    font-size:13px;
+  }
+
+  .sidebar-user {
+    padding:16px 20px;
+    border-bottom:1px solid #2a2835;
+  }
+
+  .user-avatar {
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    background:linear-gradient(135deg,#7c3aed,#4f46e5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-weight:600;
+    margin-bottom:8px;
+  }
+
+  .sidebar-nav { padding:10px; }
+
+  .nav-item {
+    display:block;
+    padding:10px;
+    border-radius:8px;
+    color:#7c7a95;
+    cursor:pointer;
+    margin-bottom:6px;
+  }
+
+  .nav-item:hover { background:#1e1c28; color:#fff; }
+  .nav-item.active { background:#221f30; color:#a78bfa; }
+
+  .main { flex:1; display:flex; flex-direction:column; }
+
+  .topbar {
+    padding:16px 24px;
+    border-bottom:1px solid #1e1c28;
+    display:flex;
+    justify-content:space-between;
+  }
+
+  .content-area { padding:24px; overflow:auto; }
+
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  .section {
+    background:#16151c;
+    border:1px solid #2a2835;
+    border-radius:14px;
+    padding:20px;
+  }
+
+  .btn {
+    padding:10px 16px;
+    border-radius:8px;
+    border:none;
+    cursor:pointer;
+  }
+
+  .btn-primary {
+    background:#7c3aed;
+    color:#fff;
+  }
+
+  .btn-secondary {
+    background:#2a2835;
+    color:#fff;
+  }
+
+  /* TABLE */
+  .data-table {
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+
+  .data-table th {
+    text-align:left;
+    padding:10px;
+    font-size:11px;
+    color:#5c5875;
+    border-bottom:1px solid #2a2835;
+  }
+
+  .data-table td {
+    padding:10px;
+    border-bottom:1px solid #1e1c28;
+    color:#c4c0d8;
+  }
+</style>
+
+<div class="dash-root">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">QR Attend</div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar">{{ session.name[0]|upper }}</div>
+      <div>{{ session.name }}</div>
+      <small style="color:#5c5875;">Student</small>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-item active" onclick="showPanel('overview', this)">Overview</div>
+      <div class="nav-item" onclick="showPanel('scan', this)">Scan QR</div>
+      <div class="nav-item" onclick="showPanel('history', this)">Attendance History</div>
+    </div>
+
+    <div style="margin-top:auto; padding:10px;">
+      <a href="/auth/logout" class="nav-item" style="color:#f87171;">Logout</a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <div class="topbar">
+      <h5 id="title">Overview</h5>
+      <a href="/student_dashboard" class="btn btn-secondary">← Dashboard</a>
+    </div>
+
+    <div class="content-area">
+
+      <!-- OVERVIEW -->
+      <div class="panel active" id="panel-overview">
+        <div class="section text-center">
+          <h3>Welcome, {{ session.name }}</h3>
+          <p>Ready to mark your attendance?</p>
+
+          <button class="btn btn-primary"
+            onclick="showPanel('scan', document.querySelector('[onclick*=scan]'))">
+            📷 Scan QR
+          </button>
+        </div>
+      </div>
+
+      <!-- SCAN -->
+      <div class="panel" id="panel-scan">
+        <div class="section text-center">
+          <h3>Scan QR Code</h3>
+          <div id="reader" style="width:300px; margin:20px auto;"></div>
+          <p id="result"></p>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="panel" id="panel-history">
+        <div class="section">
+          <h4>Attendance History</h4>
+
+          {% if attendance_history %}
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for record in attendance_history %}
+              <tr>
+                <td>{{ record.course }}</td>
+                <td>{{ record.timestamp.strftime('%d %b %Y') }}</td>
+                <td>{{ record.timestamp.strftime('%H:%M') }}</td>
+                <td style="color:#4ade80;">Present</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+            <p style="color:#5c5875;">No attendance records yet.</p>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
 </div>
 
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://unpkg.com/html5-qrcode"></script>
 
 <script>
-    function onScanSuccess(decodedText, decodedResult) {
-        // Stop scanner after successful scan
-        html5QrcodeScanner.clear();
+let scanner=null;
 
-        document.getElementById('result').innerHTML = "Processing attendance...";
+function startScanner(){
+    scanner=new Html5Qrcode("reader");
 
-        // Redirect to attendance route
-        window.location.href = "/mark_attendance/" + decodedText;
+    scanner.start(
+        {facingMode:"environment"},
+        {fps:10, qrbox:250},
+        (decodedText)=>{
+            document.getElementById('result').innerHTML="Processing...";
+            scanner.stop();
+            window.location.href="/mark_attendance/"+decodedText;
+        }
+    );
+}
+
+function showPanel(name,btn){
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    document.getElementById('panel-'+name).classList.add('active');
+
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    if(btn) btn.classList.add('active');
+
+    document.getElementById('title').innerText=name;
+
+    if(name==='scan'){
+        setTimeout(startScanner,300);
     }
-
-    var html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", { fps: 10, qrbox: 250 });
-
-    html5QrcodeScanner.render(onScanSuccess);
+}
 </script>
+
 {% endblock %}
