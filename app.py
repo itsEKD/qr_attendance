@@ -36,25 +36,33 @@ def home():
 # -----------------------
 # Lecturer Dashboard
 # -----------------------
-
 @app.route('/lecturer_dashboard')
 def lecturer_dashboard():
     if session.get('role') != 'lecturer':
         return redirect('/auth/login')
 
-    lecturer = users_col.find_one({
-        "_id": ObjectId(session.get('user_id'))
-    })
+    lecturer = users_col.find_one({"_id": ObjectId(session.get('user_id'))})
 
+    if lecturer is None:
+        session.clear()
+        return redirect('/auth/login')
+
+    lecturer['_id'] = str(lecturer['_id'])
     departments = lecturer.get('departments', [])
+
+    # Fetch all sessions for this lecturer
+    raw_sessions = list(sessions_col.find({"lecturer_id": session.get('user_id')}))
+    active_sessions = []
+    for s in raw_sessions:
+        s['_id'] = str(s['_id'])  # serialize ObjectId
+        active_sessions.append(s)
 
     return render_template(
         'lecturer_dashboard.html',
         departments=departments,
-        lecturer=lecturer
+        lecturer=lecturer,
+        active_sessions=active_sessions
     )
-
-
 
 # -----------------------
 # Start Session (Generate QR)

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow-sm p-4">
+            <h3 class="text-center mb-4">Lecturer Registration</h3>
+
+            <form method="POST" action="/auth/register_lecturer">
+
+                <!-- Full Name -->
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+
+                <!-- Email -->
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" required>
+                </div>
+
+                <!-- Staff ID -->
+                <div class="mb-3">
+                    <label class="form-label">Staff ID</label>
+                    <input type="text" name="role_id" class="form-control" placeholder="e.g LEC001" required>
+                </div>
+
+                <!-- School -->
+                <div class="mb-3">
+                    <label class="form-label">School</label>
+                    <select name="school" id="schoolSelect" class="form-select" required>
+                        <option value="">Select School</option>
+                        {% for s in schools %}
+                            <option value="{{ s.school }}">{{ s.school }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Departments (MULTI SELECT) -->
+                <div class="mb-3">
+                    <label class="form-label">Departments</label>
+                    <select name="departments" id="deptSelect" class="form-select" multiple required>
+                    </select>
+                    <small class="text-muted">Hold Ctrl (Windows) or Cmd (Mac) to select multiple</small>
+                </div>
+
+                <!-- Password -->
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+
+                <!-- Submit -->
+                <button type="submit" class="btn btn-primary w-100">
+                    Register Lecturer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- JS: Populate departments -->
+<script>
+    const schoolsData = {{ schools|tojson }};
+    const schoolSelect = document.getElementById("schoolSelect");
+    const deptSelect = document.getElementById("deptSelect");
+
+    schoolSelect.addEventListener("change", function() {
+        const selectedSchool = this.value;
+        deptSelect.innerHTML = "";
+
+        const school = schoolsData.find(s => s.school === selectedSchool);
+
+        if (school) {
+            school.departments.forEach(dept => {
+                const option = document.createElement("option");
+                option.value = dept;
+                option.textContent = dept;
+                deptSelect.appendChild(option);
+            });
+        }
+    });
+</script>
+
+{% endblock %}

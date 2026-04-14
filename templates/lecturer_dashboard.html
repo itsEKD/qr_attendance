@@ -1,70 +1,872 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container mt-5">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
-    <!-- Welcome Card -->
-    <div class="card shadow mb-4">
-        <div class="card-body text-center">
-            <h2 class="card-title mb-2">Lecturer Dashboard</h2>
-            <p class="mb-0">
-                Welcome, <strong>{{ lecturer.email }}</strong>
-            </p>
-            <p class="mb-0">
-                School: <strong>{{ lecturer.school }}</strong>
-            </p>
-        </div>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .dash-root {
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'DM Sans', sans-serif;
+    background: #0f0f13;
+    color: #e8e6f0;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: 240px;
+    min-width: 240px;
+    background: #16151c;
+    border-right: 1px solid #2a2835;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .sidebar-brand {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid #2a2835;
+  }
+
+  .brand-logo {
+    font-family: 'Space Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #a78bfa;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    color: #5c5875;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
+  }
+
+  .sidebar-user {
+    padding: 16px 20px;
+    border-bottom: 1px solid #2a2835;
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #7c3aed, #4f46e5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .user-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: #e8e6f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .user-role {
+    font-size: 11px;
+    color: #5c5875;
+    margin-top: 1px;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 12px 10px;
+    overflow-y: auto;
+  }
+
+  .nav-section {
+    margin-bottom: 20px;
+  }
+
+  .nav-section-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #3d3a52;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0 10px;
+    margin-bottom: 4px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #7c7a95;
+    font-weight: 400;
+    transition: all 0.15s;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    text-decoration: none;
+  }
+
+  .nav-item:hover {
+    background: #1e1c28;
+    color: #c4c0d8;
+  }
+
+  .nav-item.active {
+    background: #221f30;
+    color: #a78bfa;
+    font-weight: 500;
+  }
+
+  .nav-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .nav-item.active .nav-icon { opacity: 1; }
+
+  .nav-badge {
+    margin-left: auto;
+    background: #2d2a3e;
+    color: #7c7a95;
+    font-size: 10px;
+    font-family: 'Space Mono', monospace;
+    padding: 2px 7px;
+    border-radius: 20px;
+  }
+
+  .nav-item.active .nav-badge {
+    background: #3b3260;
+    color: #a78bfa;
+  }
+
+  .sidebar-footer {
+    padding: 12px 10px;
+    border-top: 1px solid #2a2835;
+  }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #0f0f13;
+  }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 28px;
+    border-bottom: 1px solid #1e1c28;
+    background: #0f0f13;
+    flex-shrink: 0;
+  }
+
+  .topbar-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: #e8e6f0;
+  }
+
+  .topbar-meta {
+    font-size: 12px;
+    color: #5c5875;
+    margin-top: 1px;
+  }
+
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px;
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── CARDS ── */
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: #16151c;
+    border: 1px solid #2a2835;
+    border-radius: 12px;
+    padding: 18px 20px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #5c5875;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 8px;
+  }
+
+  .stat-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 26px;
+    font-weight: 700;
+    color: #e8e6f0;
+  }
+
+  .stat-sub {
+    font-size: 11px;
+    color: #5c5875;
+    margin-top: 4px;
+  }
+
+  /* ── SECTION ── */
+  .section {
+    background: #16151c;
+    border: 1px solid #2a2835;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #2a2835;
+  }
+
+  .section-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #c4c0d8;
+  }
+
+  .section-body { padding: 20px; }
+
+  /* ── FORM ── */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+
+  .form-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #5c5875;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .form-select, .form-input {
+    background: #0f0f13;
+    border: 1px solid #2a2835;
+    border-radius: 8px;
+    color: #e8e6f0;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 9px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .form-select:focus, .form-input:focus {
+    border-color: #7c3aed;
+  }
+
+  .form-select option { background: #16151c; }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: #7c3aed;
+    color: #fff;
+  }
+  .btn-primary:hover { background: #6d28d9; }
+
+  .btn-ghost {
+    background: transparent;
+    color: #7c7a95;
+    border: 1px solid #2a2835;
+  }
+  .btn-ghost:hover { background: #1e1c28; color: #c4c0d8; }
+
+  .btn-danger {
+    background: transparent;
+    color: #f87171;
+    border: 1px solid #3d1f1f;
+  }
+  .btn-danger:hover { background: #1f1010; }
+
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* ── SESSION CARDS ── */
+  .session-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .session-card {
+    background: #0f0f13;
+    border: 1px solid #2a2835;
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .session-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7c3aed, #4f46e5);
+  }
+
+  .session-card.inactive::before {
+    background: #2a2835;
+  }
+
+  .session-course {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e8e6f0;
+    margin-bottom: 6px;
+  }
+
+  .session-time {
+    font-size: 11px;
+    color: #5c5875;
+    font-family: 'Space Mono', monospace;
+    margin-bottom: 14px;
+  }
+
+  .session-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  .status-active {
+    background: #0d2418;
+    color: #4ade80;
+    border: 1px solid #14532d;
+  }
+
+  .status-inactive {
+    background: #1a1a24;
+    color: #5c5875;
+    border: 1px solid #2a2835;
+  }
+
+  .status-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .session-qr {
+    width: 100%;
+    max-width: 120px;
+    border-radius: 8px;
+    margin: 10px 0;
+    border: 1px solid #2a2835;
+  }
+
+  .session-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  /* ── TABLE ── */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .data-table th {
+    font-size: 10px;
+    font-weight: 600;
+    color: #3d3a52;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid #2a2835;
+  }
+
+  .data-table td {
+    padding: 12px 14px;
+    color: #9e9ab8;
+    border-bottom: 1px solid #1e1c28;
+    vertical-align: middle;
+  }
+
+  .data-table tr:last-child td { border-bottom: none; }
+
+  .data-table tr:hover td { background: #16151c; color: #c4c0d8; }
+
+  .mono { font-family: 'Space Mono', monospace; font-size: 11px; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 48px 20px;
+    color: #3d3a52;
+  }
+
+  .empty-icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .empty-text { font-size: 13px; }
+
+  /* ── QR MODAL ── */
+  .qr-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .qr-overlay.open { display: flex; }
+
+  .qr-modal {
+    background: #16151c;
+    border: 1px solid #2a2835;
+    border-radius: 16px;
+    padding: 28px;
+    text-align: center;
+    max-width: 320px;
+    width: 90%;
+  }
+
+  .qr-modal img {
+    width: 220px;
+    height: 220px;
+    border-radius: 10px;
+    border: 1px solid #2a2835;
+    margin: 16px 0;
+  }
+
+  .qr-modal-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e8e6f0;
+  }
+
+  .qr-modal-sub {
+    font-size: 11px;
+    color: #5c5875;
+    margin-top: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #2a2835; border-radius: 4px; }
+</style>
+
+<div class="dash-root">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">QR Attend</div>
+      <div class="brand-sub">Attendance Management</div>
     </div>
 
-    <!-- Start Attendance Session -->
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            <h4 class="mb-3">Start New Attendance Session</h4>
-            <form method="POST" action="/start_session" class="row g-3">
-                <div class="col-md-8">
-                    <label for="courseSelect" class="form-label">Select Course / Department</label>
-                    <select name="course" id="courseSelect" class="form-select" required>
-                        <option value="">-- Select Course --</option>
-                        {% for dept in departments %}
-                            <option value="{{ dept }}">{{ dept }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-4 d-flex align-items-end">
-                    <button type="submit" class="btn btn-success w-100">
-                        🚀 Start & Generate QR
-                    </button>
-                </div>
-            </form>
-        </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">
+        {{ lecturer.name[0]|upper if lecturer.name else 'L' }}
+      </div>
+      <div class="user-name">{{ lecturer.name }}</div>
+      <div class="user-role">{{ lecturer.school }}</div>
     </div>
 
-    <!-- Active / Previous Sessions -->
-    {% if active_sessions %}
-    <div class="row">
-        {% for session in active_sessions %}
-        <div class="col-md-4 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h5 class="card-title">{{ session.course }}</h5>
-                    <p class="card-text">
-                        Started: {{ session.start_time.strftime('%Y-%m-%d %H:%M') }}
-                    </p>
-                    <img src="{{ url_for('static', filename='qr_codes/' + session.token + '.png') }}" class="img-fluid mb-2" alt="QR Code">
-                    <div class="d-grid gap-2">
-                        <a href="/marksheet/{{ session._id }}" class="btn btn-primary btn-sm">View Marksheet</a>
-                        <a href="/end_session/{{ session._id }}" class="btn btn-danger btn-sm">End Session</a>
-                    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-label">Main</div>
+
+        <button class="nav-item active" onclick="showPanel('overview', this)">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="1" y="1" width="6" height="6" rx="1.5"/>
+            <rect x="9" y="1" width="6" height="6" rx="1.5"/>
+            <rect x="1" y="9" width="6" height="6" rx="1.5"/>
+            <rect x="9" y="9" width="6" height="6" rx="1.5"/>
+          </svg>
+          Overview
+        </button>
+
+        <button class="nav-item" onclick="showPanel('new-session', this)">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="8" r="6.5"/>
+            <line x1="8" y1="5" x2="8" y2="11"/>
+            <line x1="5" y1="8" x2="11" y2="8"/>
+          </svg>
+          New Session
+        </button>
+
+        <button class="nav-item" onclick="showPanel('active-sessions', this)">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="8" cy="8" r="6.5"/>
+            <polyline points="8,4 8,8 11,10"/>
+          </svg>
+          Active Sessions
+          {% set active_count = active_sessions | selectattr('active', 'equalto', true) | list | length %}
+          {% if active_count > 0 %}
+          <span class="nav-badge">{{ active_count }}</span>
+          {% endif %}
+        </button>
+
+        <button class="nav-item" onclick="showPanel('history', this)">
+          <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M2 4h12v9a1 1 0 01-1 1H3a1 1 0 01-1-1V4z"/>
+            <line x1="2" y1="4" x2="14" y2="4"/>
+            <line x1="5" y1="1" x2="5" y2="4"/>
+            <line x1="11" y1="1" x2="11" y2="4"/>
+          </svg>
+          History
+          {% set past_count = active_sessions | rejectattr('active', 'equalto', true) | list | length %}
+          {% if past_count > 0 %}
+          <span class="nav-badge">{{ past_count }}</span>
+          {% endif %}
+        </button>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="/auth/logout" class="nav-item btn-danger" style="border-radius:8px;">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3"/>
+          <polyline points="10,4 14,8 10,12"/>
+          <line x1="14" y1="8" x2="5" y2="8"/>
+        </svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Overview</div>
+        <div class="topbar-meta" id="topbar-meta">{{ lecturer.email }}</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn btn-primary btn-sm" onclick="showPanel('new-session', document.querySelector('[onclick*=new-session]'))">
+          + New Session
+        </button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ── OVERVIEW PANEL ── -->
+      <div class="panel active" id="panel-overview">
+        <div class="card-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Sessions</div>
+            <div class="stat-value">{{ active_sessions | length }}</div>
+            <div class="stat-sub">All time</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Now</div>
+            <div class="stat-value" style="color:#4ade80;">{{ active_sessions | selectattr('active', 'equalto', true) | list | length }}</div>
+            <div class="stat-sub">Live sessions</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Departments</div>
+            <div class="stat-value">{{ departments | length }}</div>
+            <div class="stat-sub">Assigned to you</div>
+          </div>
+        </div>
+
+        <!-- Quick active sessions preview -->
+        {% set active_list = active_sessions | selectattr('active', 'equalto', true) | list %}
+        {% if active_list %}
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">Live Sessions</span>
+            <button class="btn btn-ghost btn-sm" onclick="showPanel('active-sessions', document.querySelector('[onclick*=active-sessions]'))">View all</button>
+          </div>
+          <div class="section-body">
+            <div class="session-grid">
+              {% for s in active_list %}
+              <div class="session-card">
+                <div class="session-course">{{ s.course }}</div>
+                <div class="session-time">{{ s.start_time.strftime('%d %b %Y · %H:%M') }}</div>
+                <span class="session-status status-active"><span class="status-dot"></span>Live</span>
+                <img src="{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}"
+                     class="session-qr" alt="QR"
+                     onclick="openQR('{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}', '{{ s.course }}')"
+                     style="cursor:pointer;" title="Click to enlarge">
+                <div class="session-actions">
+                  <a href="/marksheet/{{ s._id }}" class="btn btn-ghost btn-sm">Marksheet</a>
+                  <a href="/end_session/{{ s._id }}" class="btn btn-danger btn-sm">End</a>
                 </div>
+              </div>
+              {% endfor %}
             </div>
+          </div>
         </div>
-        {% endfor %}
-    </div>
-    {% endif %}
+        {% endif %}
 
-    <div class="text-center mt-4">
-        <a href="/auth/logout" class="btn btn-outline-danger">Logout</a>
-    </div>
+        <!-- Recent history preview -->
+        {% set past_list = active_sessions | rejectattr('active', 'equalto', true) | list %}
+        {% if past_list %}
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">Recent Sessions</span>
+            <button class="btn btn-ghost btn-sm" onclick="showPanel('history', document.querySelector('[onclick*=history]'))">View all</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in past_list[:5] %}
+              <tr>
+                <td style="color:#c4c0d8; font-weight:500;">{{ s.course }}</td>
+                <td class="mono">{{ s.start_time.strftime('%d %b %Y') }}</td>
+                <td>
+                  <div style="display:flex; gap:8px;">
+                    <a href="/marksheet/{{ s._id }}" class="btn btn-ghost btn-sm">Marksheet</a>
+                    <a href="/export_excel/{{ s._id }}" class="btn btn-ghost btn-sm">Export</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% endif %}
 
+        {% if not active_sessions %}
+        <div class="section">
+          <div class="empty">
+            <div class="empty-icon">📋</div>
+            <div class="empty-text">No sessions yet. Start one to generate a QR code.</div>
+            <button class="btn btn-primary" style="margin-top:16px;" onclick="showPanel('new-session', document.querySelector('[onclick*=new-session]'))">Start First Session</button>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ── NEW SESSION PANEL ── -->
+      <div class="panel" id="panel-new-session">
+        <div class="section" style="max-width:520px;">
+          <div class="section-header">
+            <span class="section-title">Start New Session</span>
+          </div>
+          <div class="section-body">
+            <form method="POST" action="/start_session">
+              <div class="form-group" style="margin-bottom:16px;">
+                <label class="form-label">Department / Course</label>
+                <select name="course" class="form-select" required>
+                  <option value="">Select a department</option>
+                  {% for dept in departments %}
+                  <option value="{{ dept }}">{{ dept }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary" style="width:100%;">
+                Generate QR & Start Session
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── ACTIVE SESSIONS PANEL ── -->
+      <div class="panel" id="panel-active-sessions">
+        {% set active_list = active_sessions | selectattr('active', 'equalto', true) | list %}
+        {% if active_list %}
+        <div class="session-grid">
+          {% for s in active_list %}
+          <div class="session-card">
+            <div class="session-course">{{ s.course }}</div>
+            <div class="session-time">Started {{ s.start_time.strftime('%d %b %Y · %H:%M') }}</div>
+            <span class="session-status status-active"><span class="status-dot"></span>Live</span>
+            <img src="{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}"
+                 class="session-qr" alt="QR"
+                 onclick="openQR('{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}', '{{ s.course }}')"
+                 style="cursor:pointer; max-width:160px;" title="Click to enlarge">
+            <div class="session-actions">
+              <a href="/marksheet/{{ s._id }}" class="btn btn-ghost btn-sm">📋 Marksheet</a>
+              <a href="/end_session/{{ s._id }}" class="btn btn-danger btn-sm">End Session</a>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="section">
+          <div class="empty">
+            <div class="empty-icon">⏱</div>
+            <div class="empty-text">No active sessions right now.</div>
+            <button class="btn btn-primary" style="margin-top:16px;" onclick="showPanel('new-session', document.querySelector('[onclick*=new-session]'))">Start a Session</button>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- ── HISTORY PANEL ── -->
+      <div class="panel" id="panel-history">
+        {% set past_list = active_sessions | rejectattr('active', 'equalto', true) | list %}
+        {% if past_list %}
+        <div class="section">
+          <div class="section-header">
+            <span class="section-title">All Past Sessions</span>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Course</th>
+                <th>Started</th>
+                <th>Ended</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for s in past_list %}
+              <tr>
+                <td style="color:#c4c0d8; font-weight:500;">{{ s.course }}</td>
+                <td class="mono">{{ s.start_time.strftime('%d %b · %H:%M') }}</td>
+                <td class="mono">
+                  {% if s.end_time is defined and s.end_time %}
+                    {{ s.end_time.strftime('%d %b · %H:%M') }}
+                  {% else %}—{% endif %}
+                </td>
+                <td>
+                  <div style="display:flex; gap:8px;">
+                    <a href="/marksheet/{{ s._id }}" class="btn btn-ghost btn-sm">Marksheet</a>
+                    <a href="/export_excel/{{ s._id }}" class="btn btn-ghost btn-sm">Export</a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="section">
+          <div class="empty">
+            <div class="empty-icon">📁</div>
+            <div class="empty-text">No past sessions yet.</div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+    </div>
+  </main>
 </div>
+
+<!-- QR MODAL -->
+<div class="qr-overlay" id="qr-overlay" onclick="closeQR()">
+  <div class="qr-modal" onclick="event.stopPropagation()">
+    <div class="qr-modal-title" id="qr-modal-title">Session QR Code</div>
+    <div class="qr-modal-sub">Students scan to mark attendance</div>
+    <img id="qr-modal-img" src="" alt="QR Code">
+    <button class="btn btn-ghost" onclick="closeQR()" style="width:100%;">Close</button>
+  </div>
+</div>
+
+<script>
+  const titles = {
+    'overview': ['Overview', '{{ lecturer.email }}'],
+    'new-session': ['New Session', 'Generate a QR code'],
+    'active-sessions': ['Active Sessions', 'Currently running'],
+    'history': ['Session History', 'Past attendance records'],
+  };
+
+  function showPanel(name, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    if (btn) btn.classList.add('active');
+    const [title, meta] = titles[name] || [name, ''];
+    document.getElementById('topbar-title').textContent = title;
+    document.getElementById('topbar-meta').textContent = meta;
+  }
+
+  function openQR(src, course) {
+    document.getElementById('qr-modal-img').src = src;
+    document.getElementById('qr-modal-title').textContent = course;
+    document.getElementById('qr-overlay').classList.add('open');
+  }
+
+  function closeQR() {
+    document.getElementById('qr-overlay').classList.remove('open');
+  }
+</script>
+
 {% endblock %}
