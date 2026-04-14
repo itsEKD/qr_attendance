@@ -2,9 +2,27 @@
 
 {% block content %}
 <style>
+  /* ── ESCAPE THE BASE LAYOUT ── */
+  body > nav,
+  body > footer { display: none !important; }
+
+  body {
+    overflow: hidden !important;
+    background: #0f0f13 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  main.container {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; }
 
   .dash-root {
     display: flex;
@@ -23,7 +41,6 @@
     border-right: 1px solid #2a2835;
     display: flex;
     flex-direction: column;
-    padding: 0;
     overflow: hidden;
   }
 
@@ -88,9 +105,7 @@
     overflow-y: auto;
   }
 
-  .nav-section {
-    margin-bottom: 20px;
-  }
+  .nav-section { margin-bottom: 20px; }
 
   .nav-section-label {
     font-size: 10px;
@@ -120,10 +135,7 @@
     text-decoration: none;
   }
 
-  .nav-item:hover {
-    background: #1e1c28;
-    color: #c4c0d8;
-  }
+  .nav-item:hover { background: #1e1c28; color: #c4c0d8; }
 
   .nav-item.active {
     background: #221f30;
@@ -150,23 +162,21 @@
     border-radius: 20px;
   }
 
-  .nav-item.active .nav-badge {
-    background: #3b3260;
-    color: #a78bfa;
-  }
+  .nav-item.active .nav-badge { background: #3b3260; color: #a78bfa; }
 
   .sidebar-footer {
     padding: 12px 10px;
     border-top: 1px solid #2a2835;
   }
 
-  /* ── MAIN CONTENT ── */
+  /* ── MAIN ── */
   .main {
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     background: #0f0f13;
+    min-width: 0;
   }
 
   .topbar {
@@ -175,27 +185,12 @@
     justify-content: space-between;
     padding: 16px 28px;
     border-bottom: 1px solid #1e1c28;
-    background: #0f0f13;
     flex-shrink: 0;
   }
 
-  .topbar-title {
-    font-size: 15px;
-    font-weight: 500;
-    color: #e8e6f0;
-  }
-
-  .topbar-meta {
-    font-size: 12px;
-    color: #5c5875;
-    margin-top: 1px;
-  }
-
-  .topbar-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
+  .topbar-title { font-size: 15px; font-weight: 500; color: #e8e6f0; }
+  .topbar-meta { font-size: 12px; color: #5c5875; margin-top: 1px; }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
 
   .content-area {
     flex: 1;
@@ -207,10 +202,10 @@
   .panel { display: none; }
   .panel.active { display: block; }
 
-  /* ── CARDS ── */
+  /* ── STAT CARDS ── */
   .card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 14px;
     margin-bottom: 28px;
   }
@@ -238,11 +233,7 @@
     color: #e8e6f0;
   }
 
-  .stat-sub {
-    font-size: 11px;
-    color: #5c5875;
-    margin-top: 4px;
-  }
+  .stat-sub { font-size: 11px; color: #5c5875; margin-top: 4px; }
 
   /* ── SECTION ── */
   .section {
@@ -261,23 +252,11 @@
     border-bottom: 1px solid #2a2835;
   }
 
-  .section-title {
-    font-size: 13px;
-    font-weight: 500;
-    color: #c4c0d8;
-  }
-
+  .section-title { font-size: 13px; font-weight: 500; color: #c4c0d8; }
   .section-body { padding: 20px; }
 
   /* ── FORM ── */
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 12px;
-    align-items: end;
-  }
-
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
 
   .form-label {
     font-size: 11px;
@@ -287,7 +266,7 @@
     text-transform: uppercase;
   }
 
-  .form-select, .form-input {
+  .dash-select {
     background: #0f0f13;
     border: 1px solid #2a2835;
     border-radius: 8px;
@@ -299,13 +278,11 @@
     transition: border-color 0.15s;
     appearance: none;
     -webkit-appearance: none;
+    width: 100%;
   }
 
-  .form-select:focus, .form-input:focus {
-    border-color: #7c3aed;
-  }
-
-  .form-select option { background: #16151c; }
+  .dash-select:focus { border-color: #7c3aed; }
+  .dash-select option { background: #16151c; }
 
   /* ── BUTTONS ── */
   .btn {
@@ -324,11 +301,8 @@
     white-space: nowrap;
   }
 
-  .btn-primary {
-    background: #7c3aed;
-    color: #fff;
-  }
-  .btn-primary:hover { background: #6d28d9; }
+  .btn-primary { background: #7c3aed; color: #fff; }
+  .btn-primary:hover { background: #6d28d9; color: #fff; }
 
   .btn-ghost {
     background: transparent;
@@ -342,7 +316,7 @@
     color: #f87171;
     border: 1px solid #3d1f1f;
   }
-  .btn-danger:hover { background: #1f1010; }
+  .btn-danger:hover { background: #1f1010; color: #f87171; }
 
   .btn-sm { padding: 6px 12px; font-size: 12px; }
 
@@ -359,7 +333,6 @@
     border-radius: 12px;
     padding: 18px;
     position: relative;
-    overflow: hidden;
   }
 
   .session-card::before {
@@ -368,18 +341,10 @@
     top: 0; left: 0; right: 0;
     height: 3px;
     background: linear-gradient(90deg, #7c3aed, #4f46e5);
+    border-radius: 12px 12px 0 0;
   }
 
-  .session-card.inactive::before {
-    background: #2a2835;
-  }
-
-  .session-course {
-    font-size: 14px;
-    font-weight: 600;
-    color: #e8e6f0;
-    margin-bottom: 6px;
-  }
+  .session-course { font-size: 14px; font-weight: 600; color: #e8e6f0; margin-bottom: 6px; }
 
   .session-time {
     font-size: 11px;
@@ -401,45 +366,23 @@
     margin-bottom: 14px;
   }
 
-  .status-active {
-    background: #0d2418;
-    color: #4ade80;
-    border: 1px solid #14532d;
-  }
-
-  .status-inactive {
-    background: #1a1a24;
-    color: #5c5875;
-    border: 1px solid #2a2835;
-  }
-
-  .status-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: currentColor;
-  }
+  .status-active { background: #0d2418; color: #4ade80; border: 1px solid #14532d; }
+  .status-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
   .session-qr {
     width: 100%;
-    max-width: 120px;
+    max-width: 140px;
     border-radius: 8px;
     margin: 10px 0;
     border: 1px solid #2a2835;
+    cursor: pointer;
+    display: block;
   }
 
-  .session-actions {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-top: 14px;
-  }
+  .session-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
 
   /* ── TABLE ── */
-  .data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
+  .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 
   .data-table th {
     font-size: 10px;
@@ -460,24 +403,13 @@
   }
 
   .data-table tr:last-child td { border-bottom: none; }
-
-  .data-table tr:hover td { background: #16151c; color: #c4c0d8; }
+  .data-table tr:hover td { background: #1a1824; color: #c4c0d8; }
 
   .mono { font-family: 'Space Mono', monospace; font-size: 11px; }
 
   /* ── EMPTY STATE ── */
-  .empty {
-    text-align: center;
-    padding: 48px 20px;
-    color: #3d3a52;
-  }
-
-  .empty-icon {
-    font-size: 32px;
-    margin-bottom: 12px;
-    opacity: 0.4;
-  }
-
+  .empty { text-align: center; padding: 48px 20px; color: #3d3a52; }
+  .empty-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
   .empty-text { font-size: 13px; }
 
   /* ── QR MODAL ── */
@@ -485,8 +417,8 @@
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.8);
-    z-index: 1000;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
     align-items: center;
     justify-content: center;
   }
@@ -511,18 +443,8 @@
     margin: 16px 0;
   }
 
-  .qr-modal-title {
-    font-size: 14px;
-    font-weight: 500;
-    color: #e8e6f0;
-  }
-
-  .qr-modal-sub {
-    font-size: 11px;
-    color: #5c5875;
-    margin-top: 4px;
-    font-family: 'Space Mono', monospace;
-  }
+  .qr-modal-title { font-size: 14px; font-weight: 500; color: #e8e6f0; }
+  .qr-modal-sub { font-size: 11px; color: #5c5875; margin-top: 4px; font-family: 'Space Mono', monospace; }
 
   /* ── SCROLLBAR ── */
   ::-webkit-scrollbar { width: 4px; }
@@ -536,7 +458,7 @@
   <aside class="sidebar">
     <div class="sidebar-brand">
       <div class="brand-logo">QR Attend</div>
-      <div class="brand-sub">Attendance Management</div>
+      <div class="brand-sub">Kabarak University</div>
     </div>
 
     <div class="sidebar-user">
@@ -599,7 +521,7 @@
     </nav>
 
     <div class="sidebar-footer">
-      <a href="/auth/logout" class="nav-item btn-danger" style="border-radius:8px;">
+      <a href="/auth/logout" class="nav-item" style="color:#f87171; text-decoration:none;">
         <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3"/>
           <polyline points="10,4 14,8 10,12"/>
@@ -611,7 +533,7 @@
   </aside>
 
   <!-- MAIN -->
-  <main class="main">
+  <div class="main">
     <div class="topbar">
       <div>
         <div class="topbar-title" id="topbar-title">Overview</div>
@@ -626,7 +548,7 @@
 
     <div class="content-area">
 
-      <!-- ── OVERVIEW PANEL ── -->
+      <!-- OVERVIEW -->
       <div class="panel active" id="panel-overview">
         <div class="card-grid">
           <div class="stat-card">
@@ -646,7 +568,6 @@
           </div>
         </div>
 
-        <!-- Quick active sessions preview -->
         {% set active_list = active_sessions | selectattr('active', 'equalto', true) | list %}
         {% if active_list %}
         <div class="section">
@@ -660,11 +581,11 @@
               <div class="session-card">
                 <div class="session-course">{{ s.course }}</div>
                 <div class="session-time">{{ s.start_time.strftime('%d %b %Y · %H:%M') }}</div>
-                <span class="session-status status-active"><span class="status-dot"></span>Live</span>
+                <span class="session-status status-active"><span class="status-dot"></span>Live</span><br>
                 <img src="{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}"
                      class="session-qr" alt="QR"
                      onclick="openQR('{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}', '{{ s.course }}')"
-                     style="cursor:pointer;" title="Click to enlarge">
+                     title="Click to enlarge">
                 <div class="session-actions">
                   <a href="/marksheet/{{ s._id }}" class="btn btn-ghost btn-sm">Marksheet</a>
                   <a href="/end_session/{{ s._id }}" class="btn btn-danger btn-sm">End</a>
@@ -676,7 +597,6 @@
         </div>
         {% endif %}
 
-        <!-- Recent history preview -->
         {% set past_list = active_sessions | rejectattr('active', 'equalto', true) | list %}
         {% if past_list %}
         <div class="section">
@@ -686,11 +606,7 @@
           </div>
           <table class="data-table">
             <thead>
-              <tr>
-                <th>Course</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
+              <tr><th>Course</th><th>Date</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {% for s in past_list[:5] %}
@@ -721,7 +637,7 @@
         {% endif %}
       </div>
 
-      <!-- ── NEW SESSION PANEL ── -->
+      <!-- NEW SESSION -->
       <div class="panel" id="panel-new-session">
         <div class="section" style="max-width:520px;">
           <div class="section-header">
@@ -729,9 +645,9 @@
           </div>
           <div class="section-body">
             <form method="POST" action="/start_session">
-              <div class="form-group" style="margin-bottom:16px;">
+              <div class="form-group">
                 <label class="form-label">Department / Course</label>
-                <select name="course" class="form-select" required>
+                <select name="course" class="dash-select" required>
                   <option value="">Select a department</option>
                   {% for dept in departments %}
                   <option value="{{ dept }}">{{ dept }}</option>
@@ -739,14 +655,14 @@
                 </select>
               </div>
               <button type="submit" class="btn btn-primary" style="width:100%;">
-                Generate QR & Start Session
+                Generate QR &amp; Start Session
               </button>
             </form>
           </div>
         </div>
       </div>
 
-      <!-- ── ACTIVE SESSIONS PANEL ── -->
+      <!-- ACTIVE SESSIONS -->
       <div class="panel" id="panel-active-sessions">
         {% set active_list = active_sessions | selectattr('active', 'equalto', true) | list %}
         {% if active_list %}
@@ -755,13 +671,13 @@
           <div class="session-card">
             <div class="session-course">{{ s.course }}</div>
             <div class="session-time">Started {{ s.start_time.strftime('%d %b %Y · %H:%M') }}</div>
-            <span class="session-status status-active"><span class="status-dot"></span>Live</span>
+            <span class="session-status status-active"><span class="status-dot"></span>Live</span><br>
             <img src="{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}"
                  class="session-qr" alt="QR"
                  onclick="openQR('{{ url_for('static', filename='qr_codes/' + s.token + '.png') }}', '{{ s.course }}')"
-                 style="cursor:pointer; max-width:160px;" title="Click to enlarge">
+                 style="max-width:160px;" title="Click to enlarge">
             <div class="session-actions">
-              <a href="/marksheet/{{ s._id }}" class="btn btn-ghost btn-sm">📋 Marksheet</a>
+              <a href="/marksheet/{{ s._id }}" class="btn btn-ghost btn-sm">Marksheet</a>
               <a href="/end_session/{{ s._id }}" class="btn btn-danger btn-sm">End Session</a>
             </div>
           </div>
@@ -778,7 +694,7 @@
         {% endif %}
       </div>
 
-      <!-- ── HISTORY PANEL ── -->
+      <!-- HISTORY -->
       <div class="panel" id="panel-history">
         {% set past_list = active_sessions | rejectattr('active', 'equalto', true) | list %}
         {% if past_list %}
@@ -788,12 +704,7 @@
           </div>
           <table class="data-table">
             <thead>
-              <tr>
-                <th>Course</th>
-                <th>Started</th>
-                <th>Ended</th>
-                <th>Actions</th>
-              </tr>
+              <tr><th>Course</th><th>Started</th><th>Ended</th><th>Actions</th></tr>
             </thead>
             <tbody>
               {% for s in past_list %}
@@ -827,7 +738,7 @@
       </div>
 
     </div>
-  </main>
+  </div>
 </div>
 
 <!-- QR MODAL -->
@@ -836,16 +747,16 @@
     <div class="qr-modal-title" id="qr-modal-title">Session QR Code</div>
     <div class="qr-modal-sub">Students scan to mark attendance</div>
     <img id="qr-modal-img" src="" alt="QR Code">
-    <button class="btn btn-ghost" onclick="closeQR()" style="width:100%;">Close</button>
+    <button class="btn btn-ghost" onclick="closeQR()" style="width:100%; margin-top:8px;">Close</button>
   </div>
 </div>
 
 <script>
   const titles = {
-    'overview': ['Overview', '{{ lecturer.email }}'],
-    'new-session': ['New Session', 'Generate a QR code'],
-    'active-sessions': ['Active Sessions', 'Currently running'],
-    'history': ['Session History', 'Past attendance records'],
+    'overview':        ['Overview',         '{{ lecturer.email }}'],
+    'new-session':     ['New Session',      'Generate a QR code'],
+    'active-sessions': ['Active Sessions',  'Currently running'],
+    'history':         ['Session History',  'Past attendance records'],
   };
 
   function showPanel(name, btn) {
@@ -855,11 +766,11 @@
     if (btn) btn.classList.add('active');
     const [title, meta] = titles[name] || [name, ''];
     document.getElementById('topbar-title').textContent = title;
-    document.getElementById('topbar-meta').textContent = meta;
+    document.getElementById('topbar-meta').textContent  = meta;
   }
 
   function openQR(src, course) {
-    document.getElementById('qr-modal-img').src = src;
+    document.getElementById('qr-modal-img').src           = src;
     document.getElementById('qr-modal-title').textContent = course;
     document.getElementById('qr-overlay').classList.add('open');
   }
@@ -868,5 +779,4 @@
     document.getElementById('qr-overlay').classList.remove('open');
   }
 </script>
-
 {% endblock %}
